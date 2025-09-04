@@ -13,7 +13,7 @@ app = FastAPI(title="YouTube RAG API")
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://launch-an-app.vercel.app"
+    "https://yt-rag.vercel.app"
 ]
 
 # Add CORS middleware to the application
