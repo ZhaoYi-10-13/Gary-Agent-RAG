@@ -1,5 +1,5 @@
 # Copyright 2024
-# Directory: fastapi-gcp-pro/main.py
+# Directory: yt-rag/main.py
 
 from fastapi import FastAPI
 from datetime import datetime
@@ -7,7 +7,7 @@ import requests
 from fastapi.middleware.cors import CORSMiddleware
 
 
-app = FastAPI(title="FastAPI GCP Pro")
+app = FastAPI(title="YouTube RAG API")
 
 # Define allowed origins for CORS
 origins = [
@@ -29,7 +29,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     """Root endpoint returning a welcome message."""
-    return {"message": "Welcome to FastAPI GCP Pro"}
+    return {"message": "Welcome to YouTube RAG API"}
 
 @app.get("/greet/{name}")
 async def greet(name: str):

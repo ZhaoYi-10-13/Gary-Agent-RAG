@@ -1,5 +1,5 @@
 # Python virtual environment
-venv_fastapi_gcp_pro/
+venv_yt_rag/
 __pycache__/
 *.pyc
 *.pyo
