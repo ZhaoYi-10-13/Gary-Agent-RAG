@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG AI Assistant - Advanced Chat & Document Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 90vh;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            overflow: hidden;
+        }
+
+        /* Chat Section */
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .status.connected { 
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9); 
+            color: #2e7d32; 
+        }
+        .status.error { 
+            background: linear-gradient(135deg, #ffebee, #ffcdd2); 
+            color: #c62828; 
+        }
+        .status.warning { 
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2); 
+            color: #ef6c00; 
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #1565c0;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin: 0 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .citations {
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.8;
+            font-style: italic;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-input button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 20px;
+            margin: 10px 0;
+            width: fit-content;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .typing-dots {
+            display: inline-block;
+        }
+
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1565c0;
+            margin: 0 2px;
+            animation: typing 1.4s infinite both;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        /* Document Editor Section */
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .editor-header {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .editor-header h2 {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .editor-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .editor-tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .document-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-id {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        .document-source {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .document-text {
+            padding: 20px;
+        }
+
+        .document-text textarea {
+            width: 100%;
+            min-height: 120px;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: transparent;
+            resize: vertical;
+        }
+
+        .save-section {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--success-color), #388e3c);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .save-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .save-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .save-button.loading {
+            background: var(--info-color);
+            cursor: not-allowed;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: var(--success-color); }
+        .notification.error { background: var(--error-color); }
+        .notification.info { background: var(--info-color); }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+                height: 95vh;
+            }
+            
+            .editor-section {
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .app-container {
+                border-radius: 10px;
+                height: 95vh;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .chat-header h1 {
+                font-size: 20px;
+            }
+            
+            .editor-header h2 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h1>
+                    <span>🤖</span>
+                    <span>RAG AI Assistant</span>
+                    <span>✨</span>
+                </h1>
+                <p>Advanced Chat & Document Management System</p>
+            </div>
+            
+            <div class="status" id="status">🔍 Checking connection...</div>
+            
+            <div class="chat-messages" id="messages">
+                <div class="message bot">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        Welcome to the advanced RAG AI Assistant! 🎉
+                        <br><br>
+                        I can help you with:
+                        • Questions about policies and services
+                        • Return and shipping information
+                        • Customer support inquiries
+                        <br><br>
+                        You can also edit the knowledge base documents on the right panel and update the vector database in real-time!
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing">
+                <div class="message-avatar">🤖</div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask me anything about our policies..." maxlength="500">
+                <button onclick="sendMessage()" id="sendBtn">Send</button>
+            </div>
+        </div>
+
+        <!-- Document Editor Section -->
+        <div class="editor-section">
+            <div class="editor-header">
+                <div>
+                    <h2>📚 Knowledge Base Editor</h2>
+                    <p>Edit documents and update the vector database</p>
+                </div>
+            </div>
+
+            <div class="editor-tabs">
+                <button class="tab-button active" onclick="switchTab('documents')">Documents</button>
+                <button class="tab-button" onclick="switchTab('settings')">Settings</button>
+            </div>
+
+            <div class="tab-content" id="documentsTab">
+                <div id="documentsContainer">
+                    <!-- Documents will be loaded here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="settingsTab" style="display: none;">
+                <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                    <h3>⚙️ Settings</h3>
+                    <p>Advanced settings and configurations coming soon!</p>
+                    <br>
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; text-align: left;">
+                        <h4 style="margin-bottom: 10px;">Current Configuration:</h4>
+                        <p><strong>API Endpoint:</strong> http://localhost:8000</p>
+                        <p><strong>Embedding Model:</strong> text-embedding-3-small</p>
+                        <p><strong>Chat Model:</strong> gpt-4o</p>
+                        <p><strong>Top-K Results:</strong> 6</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="save-section">
+                <button class="save-button" id="saveBtn" onclick="saveDocuments()">
+                    <span id="saveText">💾 Save & Update Vector Database</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typing');
+        const statusDiv = document.getElementById('status');
+        const documentsContainer = document.getElementById('documentsContainer');
+        const saveBtn = document.getElementById('saveBtn');
+        const notification = document.getElementById('notification');
+
+        let documents = [];
+        let currentTab = 'documents';
+
+        // Initialize the application
+        init();
+
+        async function init() {
+            await checkHealth();
+            await loadDocuments();
+            messageInput.focus();
+        }
+
+        // Send message on Enter key
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/healthz`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.database_connected) {
+                        statusDiv.innerHTML = '🟢 <strong>Connected and ready</strong>';
+                        statusDiv.className = 'status connected';
+                    } else {
+                        statusDiv.innerHTML = '🟡 <strong>Connected</strong> - Database issues detected';
+                        statusDiv.className = 'status warning';
+                    }
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '🔴 <strong>Server offline</strong> - Start with: <code>uvicorn main:app --reload --port 8000</code>';
+                statusDiv.className = 'status error';
+            }
+        }
+
+        async function loadDocuments() {
+            // Load default documents structure
+            documents = [
+                {
+                    chunk_id: 'policy_returns_v1',
+                    source: 'https://help.example.com/return-policy',
+                    text: `Return Policy
+
+You can return unworn items within 30 days of purchase with original receipt. Items must be in original condition with tags attached. 
+
+IMPORTANT: Items over $200 require manual approval for returns. Please email support@company.com with your order details for items over $200.
+
+Exceptions: Final sale items, customized products, and intimate apparel cannot be returned. Shoes must be unworn with original box.
+
+Refunds will be processed to original payment method within 5-7 business days after we receive your return.`
+                },
+                {
+                    chunk_id: 'policy_shipping_v1',
+                    source: 'https://help.example.com/shipping-policy',
+                    text: `Shipping Policy
+
+Standard shipping (5-7 business days): FREE on orders over $50, otherwise $5.99
+Express shipping (2-3 business days): $9.99
+Overnight shipping (1 business day): $19.99
+
+We ship Monday through Friday. Orders placed after 2 PM EST ship the next business day.
+
+International shipping available to select countries. Duties and taxes may apply and are the responsibility of the customer.`
+                },
+                {
+                    chunk_id: 'sizing_guide_v1',
+                    source: 'https://help.example.com/sizing-guide',
+                    text: `Sizing Guide
+
+Our sizes run true to standard US sizing. If you're between sizes, we recommend sizing up for comfort.
+
+Size Exchange Policy: Free size exchanges within 30 days for unworn items with tags attached.
+
+Measurement Guide:
+- Small: Chest 34-36", Waist 28-30"
+- Medium: Chest 38-40", Waist 32-34" 
+- Large: Chest 42-44", Waist 36-38"
+- X-Large: Chest 46-48", Waist 40-42"
+
+For shoes, please refer to our shoe size chart. Most customers find our shoes run half a size small.`
+                },
+                {
+                    chunk_id: 'customer_support_v1',
+                    source: 'https://help.example.com/contact-support',
+                    text: `Customer Support
+
+We're here to help! Contact us through:
+
+Email: support@company.com (24-48 hour response)
+Phone: 1-800-HELP-NOW (Mon-Fri 9 AM - 6 PM EST)
+Live Chat: Available on our website (Mon-Fri 9 AM - 9 PM EST)
+
+For fastest service, please include your order number and detailed description of your issue.
+
+Common Issues:
+- Order tracking and delivery questions
+- Product defects or quality concerns  
+- Return and exchange requests
+- Account and billing questions`
+                }
+            ];
+
+            renderDocuments();
+        }
+
+        function renderDocuments() {
+            documentsContainer.innerHTML = '';
+            
+            documents.forEach((doc, index) => {
+                const docElement = document.createElement('div');
+                docElement.className = 'document-item';
+                docElement.innerHTML = `
+                    <div class="document-header">
+                        <div>
+                            <div class="document-id">${doc.chunk_id}</div>
+                            <div class="document-source">${doc.source}</div>
+                        </div>
+                    </div>
+                    <div class="document-text">
+                        <textarea 
+                            id="doc-${index}" 
+                            placeholder="Enter document content..."
+                            oninput="updateDocument(${index}, this.value)"
+                        >${doc.text}</textarea>
+                    </div>
+                `;
+                documentsContainer.appendChild(docElement);
+            });
+        }
+
+        function updateDocument(index, text) {
+            documents[index].text = text;
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Show/hide tab content
+            document.getElementById('documentsTab').style.display = tabName === 'documents' ? 'block' : 'none';
+            document.getElementById('settingsTab').style.display = tabName === 'settings' ? 'block' : 'none';
+        }
+
+        async function saveDocuments() {
+            const saveText = document.getElementById('saveText');
+            const originalText = saveText.innerHTML;
+            
+            saveBtn.disabled = true;
+            saveBtn.classList.add('loading');
+            saveText.innerHTML = '🔄 Updating Vector Database...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/seed`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        docs: documents
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showNotification(`✅ Successfully updated ${data.inserted} documents in vector database!`, 'success');
+                    saveText.innerHTML = '✅ Saved Successfully!';
+                    
+                    setTimeout(() => {
+                        saveText.innerHTML = originalText;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to save documents');
+                }
+            } catch (error) {
+                showNotification('❌ Failed to update vector database. Please try again.', 'error');
+                saveText.innerHTML = '❌ Save Failed';
+                
+                setTimeout(() => {
+                    saveText.innerHTML = originalText;
+                }, 2000);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('loading');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function addMessage(content, isUser = false, citations = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : '🤖';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+            
+            if (citations.length > 0) {
+                const citationsDiv = document.createElement('div');
+                citationsDiv.className = 'citations';
+                citationsDiv.innerHTML = `📚 Sources: ${citations.join(', ')}`;
+                contentDiv.appendChild(citationsDiv);
+            }
+            
+            if (isUser) {
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentDiv);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            showTyping();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: message,
+                        top_k: 6
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    hideTyping();
+                    addMessage(data.text, false, data.citations || []);
+                } else {
+                    hideTyping();
+                    addMessage('Sorry, I encountered an error processing your question. Please try again later. 🔧', false);
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage('Sorry, I cannot connect to the server. Please make sure it\'s running and try again. 🔌', false);
+            } finally {
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
