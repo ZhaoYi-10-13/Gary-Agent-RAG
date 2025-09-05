@@ -4,7 +4,7 @@ A minimal, production-ready FastAPI backend demonstrating **Retrieval-Augmented 
 
 📹 Full YouTube Guide: [Youtube link](https://www.youtube.com/watch?v=ZREt9MAozho&list=PLE9hy4A7ZTmpGq7GHf5tgGFWh2277AeDR&index=24)
 
-🚀 X Post: [X link](https://x.com/ShenSeanChen/status/1895163913161109792)
+🚀 X Post: [X link](https://x.com/ShenSeanChen/status/1964074873296388546)
 
 💡 Try the RAG AI Agent: [App link](https://yt-rag-431569812034.us-east1.run.app/chat)
 
