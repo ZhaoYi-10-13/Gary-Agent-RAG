@@ -18,6 +18,7 @@ from .core.database import db
 from .models.requests import SeedRequest, AnswerRequest
 from .models.responses import SeedResponse, AnswerResponse, HealthResponse, ErrorResponse
 from .services.rag import rag_service
+from .data.default_documents import DEFAULT_DOCUMENTS
 
 # Configure logging
 logging.basicConfig(
@@ -104,6 +105,7 @@ async def root():
             "health": "/healthz",
             "seed": "/seed",
             "answer": "/answer",
+            "documents": "/documents",
             "greet": "/greet/{name}"
         }
     }
@@ -141,6 +143,17 @@ async def health_check():
             status_code=503,
             detail=f"Service unavailable: {str(e)}"
         )
+
+
+@app.get("/documents", tags=["General"])
+async def get_documents():
+    """
+    Get the default documents used for seeding the knowledge base.
+    
+    Returns:
+        List of default documents with their chunk_id, source, and text
+    """
+    return {"documents": DEFAULT_DOCUMENTS}
 
 
 @app.post("/seed", response_model=SeedResponse, tags=["RAG"])

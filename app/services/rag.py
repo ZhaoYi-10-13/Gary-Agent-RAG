@@ -11,8 +11,10 @@ import time
 import re
 from typing import List, Dict, Any, Tuple
 from ..core.database import db
-from .embedding import embedding_service, chat_service
-from .chunker import chunker, DEFAULT_DOCUMENTS
+from .embedding import embedding_service
+from .chat import chat_service
+from .chunker import chunker
+from ..data.default_documents import DEFAULT_DOCUMENTS
 
 logger = logging.getLogger(__name__)
 

@@ -657,71 +657,23 @@
         }
 
         async function loadDocuments() {
-            // Load default documents structure
-            documents = [
-                {
-                    chunk_id: 'policy_returns_v1',
-                    source: 'https://help.example.com/return-policy',
-                    text: `Return Policy
-
-You can return unworn items within 30 days of purchase with original receipt. Items must be in original condition with tags attached. 
-
-IMPORTANT: Items over $200 require manual approval for returns. Please email support@company.com with your order details for items over $200.
-
-Exceptions: Final sale items, customized products, and intimate apparel cannot be returned. Shoes must be unworn with original box.
-
-Refunds will be processed to original payment method within 5-7 business days after we receive your return.`
-                },
-                {
-                    chunk_id: 'policy_shipping_v1',
-                    source: 'https://help.example.com/shipping-policy',
-                    text: `Shipping Policy
-
-Standard shipping (5-7 business days): FREE on orders over $50, otherwise $5.99
-Express shipping (2-3 business days): $9.99
-Overnight shipping (1 business day): $19.99
-
-We ship Monday through Friday. Orders placed after 2 PM EST ship the next business day.
-
-International shipping available to select countries. Duties and taxes may apply and are the responsibility of the customer.`
-                },
-                {
-                    chunk_id: 'sizing_guide_v1',
-                    source: 'https://help.example.com/sizing-guide',
-                    text: `Sizing Guide
-
-Our sizes run true to standard US sizing. If you're between sizes, we recommend sizing up for comfort.
-
-Size Exchange Policy: Free size exchanges within 30 days for unworn items with tags attached.
-
-Measurement Guide:
-- Small: Chest 34-36", Waist 28-30"
-- Medium: Chest 38-40", Waist 32-34" 
-- Large: Chest 42-44", Waist 36-38"
-- X-Large: Chest 46-48", Waist 40-42"
-
-For shoes, please refer to our shoe size chart. Most customers find our shoes run half a size small.`
-                },
-                {
-                    chunk_id: 'customer_support_v1',
-                    source: 'https://help.example.com/contact-support',
-                    text: `Customer Support
-
-We're here to help! Contact us through:
-
-Email: support@company.com (24-48 hour response)
-Phone: 1-800-HELP-NOW (Mon-Fri 9 AM - 6 PM EST)
-Live Chat: Available on our website (Mon-Fri 9 AM - 9 PM EST)
-
-For fastest service, please include your order number and detailed description of your issue.
-
-Common Issues:
-- Order tracking and delivery questions
-- Product defects or quality concerns  
-- Return and exchange requests
-- Account and billing questions`
+            try {
+                // Fetch documents from the API
+                const response = await fetch(`${API_BASE}/documents`);
+                if (response.ok) {
+                    const data = await response.json();
+                    documents = data.documents || [];
+                    console.log(`✅ Loaded ${documents.length} documents from API`);
+                } else {
+                    console.warn('Failed to fetch documents from API, using fallback');
+                    // Fallback to empty array - user can add documents manually
+                    documents = [];
                 }
-            ];
+            } catch (error) {
+                console.error('Error loading documents:', error);
+                // Fallback to empty array
+                documents = [];
+            }
 
             renderDocuments();
         }
