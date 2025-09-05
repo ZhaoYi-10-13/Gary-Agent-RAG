@@ -2,6 +2,16 @@
 
 A minimal, production-ready FastAPI backend demonstrating **Retrieval-Augmented Generation (RAG)** with vector similarity search. Built for educational purposes and easy frontend integration.
 
+📹 Full YouTube Guide: [Youtube link](https://www.youtube.com/watch?v=ZREt9MAozho&list=PLE9hy4A7ZTmpGq7GHf5tgGFWh2277AeDR&index=24)
+
+🚀 X Post: [X link](https://x.com/ShenSeanChen/status/1895163913161109792)
+
+💡 Try the RAG AI Agent: [App link](https://yt-rag-431569812034.us-east1.run.app/chat)
+
+☕️ Buy me a coffee: [Cafe Latte](https://buy.stripe.com/5kA176bA895ggog4gh)
+
+🤖️ Discord: [Invite link](https://discord.com/invite/TKKPzZheua)
+
 ## 🎯 Features
 
 - **FastAPI** backend with automatic API documentation
