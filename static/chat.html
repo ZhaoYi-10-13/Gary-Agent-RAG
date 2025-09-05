@@ -611,7 +611,8 @@
     <div class="notification" id="notification"></div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8000';
+        // Automatically detect the correct API base URL
+        const API_BASE_URL = window.location.origin;
         const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
