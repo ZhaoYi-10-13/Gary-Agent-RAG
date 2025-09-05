@@ -659,7 +659,7 @@
         async function loadDocuments() {
             try {
                 // Fetch documents from the API
-                const response = await fetch(`${API_BASE}/documents`);
+                const response = await fetch(`${API_BASE_URL}/documents`);
                 if (response.ok) {
                     const data = await response.json();
                     documents = data.documents || [];
