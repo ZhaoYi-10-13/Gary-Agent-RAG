@@ -169,7 +169,7 @@ class Database:
             else:
                 # Fallback: if RPC function doesn't exist, use regular query
                 # This won't have vector similarity but will work for basic testing
-                logger.warning("match_chunks RPC function not found, using fallback query")
+                logger.info("Using fallback query (match_chunks RPC function not available)")
                 result = client.table('rag_chunks').select('*').limit(top_k).execute()
                 
                 # Add mock similarity scores for fallback

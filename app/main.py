@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from .core.config import get_settings
 from .core.database import db
@@ -85,6 +85,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def chat_interface():
     """Serve the chat interface."""
     return FileResponse("static/chat.html")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Handle favicon requests to prevent 404 errors."""
+    return Response(status_code=204)  # No Content
 
 
 @app.get("/", tags=["General"])

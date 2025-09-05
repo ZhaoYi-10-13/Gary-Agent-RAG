@@ -12,23 +12,29 @@
         }
 
         :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --success-color: #4caf50;
-            --error-color: #f44336;
-            --warning-color: #ff9800;
-            --info-color: #2196f3;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --bg-primary: #f8f9fa;
+            --primary-color: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #06b6d4;
+            --success-color: #8b5cf6;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --bg-primary: #f9fafb;
             --bg-secondary: #ffffff;
-            --border-color: #e0e0e0;
-            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --bg-accent: #f1f5f9;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #f8fafc 50%, #f1f5f9 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -41,11 +47,13 @@
             max-width: 1400px;
             height: 90vh;
             background: var(--bg-secondary);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
             display: grid;
             grid-template-columns: 1fr 400px;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         /* Chat Section */
@@ -53,13 +61,28 @@
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border-color);
+            min-height: 0; /* Important for flex scrolling */
+            height: 100%; /* Ensure full height */
         }
 
         .chat-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
             color: white;
-            padding: 20px;
+            padding: 24px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .chat-header h1 {
@@ -85,23 +108,29 @@
         }
 
         .status.connected { 
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9); 
-            color: #2e7d32; 
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb); 
+            color: var(--success-color);
+            border: 1px solid #d1d5db;
         }
         .status.error { 
-            background: linear-gradient(135deg, #ffebee, #ffcdd2); 
-            color: #c62828; 
+            background: linear-gradient(135deg, #fef2f2, #fecaca); 
+            color: var(--error-color);
+            border: 1px solid #fca5a5;
         }
         .status.warning { 
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2); 
-            color: #ef6c00; 
+            background: linear-gradient(135deg, #fffbeb, #fed7aa); 
+            color: var(--warning-color);
+            border: 1px solid #fdba74;
         }
 
         .chat-messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
             background: var(--bg-primary);
+            min-height: 0; /* Important for flex scrolling */
+            max-height: 100%; /* Ensure it doesn't exceed container */
         }
 
         .message {
@@ -125,15 +154,17 @@
         }
 
         .message.bot .message-content {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            color: #1565c0;
-            border-bottom-left-radius: 5px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            color: var(--text-primary);
+            border-bottom-left-radius: 8px;
+            border: 1px solid #bae6fd;
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .message-avatar {
@@ -149,13 +180,15 @@
         }
 
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            background: linear-gradient(135deg, var(--accent-color), #0891b2);
             color: white;
+            border: 2px solid white;
         }
 
         .message.user .message-avatar {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
+            border: 2px solid white;
         }
 
         .citations {
@@ -218,28 +251,39 @@
 
         .typing-indicator {
             display: none;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
             border-radius: 20px;
             margin: 10px 0;
             width: fit-content;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #bae6fd;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .typing-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .typing-dots {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .typing-dots span {
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #1565c0;
-            margin: 0 2px;
+            background: var(--accent-color);
             animation: typing 1.4s infinite both;
         }
 
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
         .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
         .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
@@ -248,6 +292,8 @@
             display: flex;
             flex-direction: column;
             background: var(--bg-primary);
+            min-height: 0; /* Important for flex scrolling */
+            height: 100%; /* Ensure full height */
         }
 
         .editor-header {
@@ -299,6 +345,9 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0; /* Important for flex scrolling */
+            max-height: 100%; /* Ensure it doesn't exceed container */
         }
 
         .document-item {
@@ -363,7 +412,7 @@
         .save-button {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, var(--success-color), #388e3c);
+            background: linear-gradient(135deg, var(--success-color), #7c3aed);
             color: white;
             border: none;
             border-radius: 12px;
@@ -371,12 +420,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         .save-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
         .save-button:disabled {
@@ -472,8 +521,8 @@
         <div class="chat-section">
             <div class="chat-header">
                 <h1>
-                    <span>🤖</span>
-                    <span>RAG AI Assistant</span>
+                    <span>💬</span>
+                    <span>E-Commerce Customer Support</span>
                     <span>✨</span>
                 </h1>
                 <p>Advanced Chat & Document Management System</p>
@@ -483,9 +532,9 @@
             
             <div class="chat-messages" id="messages">
                 <div class="message bot">
-                    <div class="message-avatar">🤖</div>
+                    <div class="message-avatar">✨</div>
                     <div class="message-content">
-                        Welcome to the advanced RAG AI Assistant! 🎉
+                        Welcome to the AI Assistant! 👋
                         <br><br>
                         I can help you with:
                         • Questions about policies and services
@@ -498,11 +547,14 @@
             </div>
             
             <div class="typing-indicator" id="typing">
-                <div class="message-avatar">🤖</div>
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div class="message-avatar">💭</div>
+                <div class="typing-content">
+                    <span style="color: var(--text-secondary); font-size: 14px; margin-right: 8px;">Thinking</span>
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
             </div>
             
@@ -516,7 +568,7 @@
         <div class="editor-section">
             <div class="editor-header">
                 <div>
-                    <h2>📚 Knowledge Base Editor</h2>
+                    <h2>📋 Knowledge Base Editor</h2>
                     <p>Edit documents and update the vector database</p>
                 </div>
             </div>
@@ -782,7 +834,7 @@ Common Issues:
             
             const avatar = document.createElement('div');
             avatar.className = 'message-avatar';
-            avatar.textContent = isUser ? '👤' : '🤖';
+            avatar.textContent = isUser ? '👤' : '✨';
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
