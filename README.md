@@ -2,16 +2,6 @@
 
 A minimal, production-ready FastAPI backend demonstrating **Retrieval-Augmented Generation (RAG)** with vector similarity search. Built for educational purposes and easy frontend integration.
 
-📹 Full YouTube Guide: [Youtube link](https://www.youtube.com/watch?v=ZREt9MAozho&list=PLE9hy4A7ZTmpGq7GHf5tgGFWh2277AeDR&index=24)
-
-🚀 X Post: [X link](https://x.com/ShenSeanChen/status/1964074873296388546)
-
-💡 Try the RAG AI Agent: [App link](https://yt-rag-431569812034.us-east1.run.app/chat)
-
-☕️ Buy me a coffee: [Cafe Latte](https://buy.stripe.com/5kA176bA895ggog4gh)
-
-🤖️ Discord: [Invite link](https://discord.com/invite/TKKPzZheua)
-
 ## 🎯 Features
 
 - **FastAPI** backend with automatic API documentation
@@ -25,7 +15,7 @@ A minimal, production-ready FastAPI backend demonstrating **Retrieval-Augmented 
 ## 🏗️ Architecture
 
 ```
-yt-rag/
+Gary-Agent-RAG/
 ├── app/
 │   ├── core/           # Infrastructure (config, database)
 │   ├── models/         # Pydantic data models
@@ -51,12 +41,12 @@ yt-rag/
 
 ```bash
 # Clone the repository
-git clone https://github.com/ShenSeanChen/yt-rag.git
-cd yt-rag
+git clone https://github.com/ZhaoYi-10-13/Gary-Agent-RAG.git
+cd Gary-Agent-RAG
 
 # Create virtual environment
-python3.11 -m venv venv_yt_rag
-source venv_yt_rag/bin/activate  # On Windows: venv_yt_rag\Scripts\activate
+python3.11 -m venv venv_gary_rag
+source venv_gary_rag/bin/activate  # On Windows: venv_gary_rag\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -263,72 +253,3 @@ When adding Google authentication:
 3. Frontend and backend will share the same Supabase client
 4. No backend changes needed!
 
-## 📁 Project Structure
-
-```
-yt-rag/
-├── app/
-│   ├── core/
-│   │   ├── config.py      # Environment & settings
-│   │   └── database.py    # Supabase client & operations
-│   ├── models/
-│   │   ├── requests.py    # API request schemas
-│   │   ├── responses.py   # API response schemas
-│   │   └── entities.py    # Database entities
-│   ├── services/
-│   │   ├── embedding.py   # AI provider abstraction
-│   │   ├── rag.py        # RAG pipeline logic
-│   │   └── chunker.py    # Text processing utilities
-│   └── main.py           # FastAPI app & routes
-├── sql/
-│   └── init_supabase.sql # Database setup script
-├── .env.example          # Environment template
-├── requirements.txt      # Python dependencies
-├── Dockerfile           # Container configuration
-└── README.md           # This file
-```
-
-## 🛠️ Development
-
-### Running Tests
-```bash
-# Install dev dependencies
-pip install pytest pytest-asyncio httpx
-
-# Run tests (coming soon)
-pytest
-```
-
-### Code Quality
-```bash
-# Format code
-black app/
-isort app/
-
-# Lint code
-flake8 app/
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙋‍♂️ Support
-
-- 📚 **Documentation**: Check the `/docs` endpoint when running
-- 🐛 **Issues**: [GitHub Issues](https://github.com/ShenSeanChen/yt-rag/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/ShenSeanChen/yt-rag/discussions)
-
----
-
-**Built with ❤️ for the developer community**
-
-*This project demonstrates modern RAG architecture patterns and is perfect for learning, prototyping, or building production applications.*
