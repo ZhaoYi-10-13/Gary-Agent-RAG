@@ -5,6 +5,11 @@
 """
 Test script to verify RAG backend setup is working correctly.
 Run this after completing the setup steps.
+
+改动要点：
+1) 在导入项目模块前，清理掉 OPENAI_API_BASE 等非法 key（避免 Pydantic extra=forbid）
+2) 按 AI_PROVIDER 动态校验所需的环境变量（aliyun / openai）
+3) 按 provider 打印 Chat / Embedding 实际配置与 Base URL
 """
 
 import asyncio
@@ -15,11 +20,25 @@ from pathlib import Path
 # Add the app directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
 
+
+def _sanitize_env():
+    """清理 Pydantic 不允许的 env 键"""
+    forbidden = ["OPENAI_API_BASE", "OPENAI_BASE_URL", "openai_api_base", "openai_base_url"]
+    removed = []
+    for key in forbidden:
+        if key in os.environ:
+            removed.append((key, os.environ.pop(key)))
+    if removed:
+        print("ℹ️  Removed unsupported keys for Pydantic(extra='forbid'):")
+        for k, _ in removed:
+            print(f"   - {k} (was set)")
+
+
 async def test_setup():
     """Test the complete RAG setup."""
     print("🧪 Testing RAG Backend Setup...")
     print("=" * 50)
-    
+
     try:
         # Test 1: Import modules
         print("1️⃣  Testing imports...")
@@ -27,116 +46,106 @@ async def test_setup():
         from app.core.database import db
         from app.services.rag import rag_service
         print("   ✅ All modules imported successfully")
-        
+
         # Test 2: Check configuration
         print("\n2️⃣  Testing configuration...")
         settings = get_settings()
-        
-        # Check required environment variables
+        provider = (getattr(settings, "ai_provider", "aliyun") or "aliyun").lower()
+
+        # 基础必需项（与 provider 无关）
         required_vars = [
-            'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
-            'OPENAI_API_KEY'
+            "SUPABASE_URL",
+            "SUPABASE_ANON_KEY",
+            "SUPABASE_SERVICE_ROLE_KEY",
         ]
-        
-        missing_vars = []
-        for var in required_vars:
-            if not os.getenv(var) or os.getenv(var) == f"your_{var.lower()}_here":
-                missing_vars.append(var)
-        
-        if missing_vars:
-            print(f"   ❌ Missing environment variables: {', '.join(missing_vars)}")
-            print("   💡 Please update your .env file with real API keys")
+        # 根据 provider 追加必需项
+        if provider == "aliyun":
+            required_vars += ["ALIYUN_API_KEY"]
+        else:
+            required_vars += ["OPENAI_API_KEY"]
+
+        missing = [v for v in required_vars if not os.getenv(v) or "your_" in os.getenv(v)]
+        if missing:
+            print(f"   ❌ Missing environment variables: {', '.join(missing)}")
             return False
-        
+
+        # 打印关键配置（随 provider 变化）
         print("   ✅ Environment variables configured")
-        print(f"   📊 Using embedding model: {settings.openai_embed_model}")
-        print(f"   🤖 Using chat model: {settings.openai_chat_model}")
-        print(f"   🔗 Using AI provider: {settings.ai_provider}")
-        
+        if provider == "aliyun":
+            print(f"   📊 Embedding model: {getattr(settings, 'aliyun_embed_model', 'N/A')}")
+            print(f"   🤖 Chat model: {getattr(settings, 'aliyun_chat_model', 'N/A')}")
+            print(f"   🔗 AI provider: {provider}")
+            print(f"   🌐 Base URL: https://dashscope.aliyuncs.com/compatible-mode/v1")
+        else:
+            print(f"   📊 Embedding model: {getattr(settings, 'openai_embed_model', 'N/A')}")
+            print(f"   🤖 Chat model: {getattr(settings, 'openai_chat_model', 'N/A')}")
+            print(f"   🔗 AI provider: {provider}")
+            # OpenAI 情况不强制打印 base_url，避免误导
+
         # Test 3: Database connection
         print("\n3️⃣  Testing database connection...")
         await db.connect()
-        health = await db.health_check()
-        
-        if not health:
+        if not await db.health_check():
             print("   ❌ Database connection failed")
-            print("   💡 Check your Supabase credentials and ensure the project is active")
             return False
-        
         print("   ✅ Database connection successful")
-        
+
         # Test 4: Schema validation
         print("\n4️⃣  Testing database schema...")
         await db.initialize_schema()
         print("   ✅ Database schema validated")
-        
+
         # Test 5: Seeding documents
         print("\n5️⃣  Testing document seeding...")
-        inserted_count = await rag_service.seed_documents()
-        
-        if inserted_count == 0:
+        inserted = await rag_service.seed_documents()
+        if inserted == 0:
             print("   ⚠️  No new documents inserted (may already exist)")
         else:
-            print(f"   ✅ Successfully seeded {inserted_count} document chunks")
-        
+            print(f"   ✅ Seeded {inserted} document chunks")
+
         # Test 6: RAG query
         print("\n6️⃣  Testing RAG query...")
-        test_query = "Can I return shoes after 30 days?"
-        result = await rag_service.answer_query(test_query)
-        
-        if not result['text'] or "error" in result['text'].lower():
+        result = await rag_service.answer_query("Can I return shoes after 30 days?")
+        txt = result.get("text")
+        if not txt or "error" in str(txt).lower():
             print("   ❌ RAG query failed")
-            print(f"   🔍 Response: {result['text'][:100]}...")
+            print(f"   🔍 Response: {txt}")
             return False
-        
+
         print("   ✅ RAG query successful!")
-        print(f"   📝 Answer: {result['text'][:100]}...")
-        print(f"   📚 Citations: {result['citations']}")
-        print(f"   ⏱️  Latency: {result['debug']['latency_ms']}ms")
-        
-        # Cleanup
+        print(f"   📝 Answer: {txt[:100]}...")
+        print(f"   📚 Citations: {result.get('citations')}")
+        if "debug" in result:
+            print(f"   ⏱️  Latency: {result['debug'].get('latency_ms', 'N/A')}ms")
+
         await db.disconnect()
-        
         print("\n🎉 ALL TESTS PASSED!")
         print("=" * 50)
-        print("✅ Your RAG backend is fully functional!")
-        print("🚀 You can now start the server with: uvicorn main:app --reload --port 8000")
-        print("📚 Visit http://localhost:8000/docs for interactive API documentation")
-        
         return True
-        
-    except ImportError as e:
-        print(f"   ❌ Import error: {e}")
-        print("   💡 Make sure you've installed dependencies: pip install -r requirements.txt")
-        return False
-        
+
     except Exception as e:
         print(f"   ❌ Setup test failed: {e}")
-        print("   💡 Check the error message above and refer to QUICKSTART.md")
         return False
 
 
 async def main():
-    """Main test function."""
     print("🔧 RAG Backend Setup Verification")
     print("This will test your complete setup without starting the server.\n")
-    
-    # Load environment variables
+
     from dotenv import load_dotenv
     load_dotenv()
-    
-    success = await test_setup()
-    
-    if success:
+    _sanitize_env()
+
+    ok = await test_setup()
+    if ok:
         print("\n🎯 Next Steps:")
         print("1. Start the server: uvicorn main:app --reload --port 8000")
         print("2. Test the health endpoint: curl http://localhost:8000/healthz")
         print("3. Ask a question: curl -X POST http://localhost:8000/answer -H 'Content-Type: application/json' -d '{\"query\":\"What is your return policy?\"}'")
-        print("4. Visit the interactive docs: http://localhost:8000/docs")
+        print("4. Visit docs: http://localhost:8000/docs")
         sys.exit(0)
     else:
-        print("\n❌ Setup incomplete. Please fix the issues above and try again.")
-        print("📖 Refer to QUICKSTART.md for detailed setup instructions.")
+        print("\n❌ Setup incomplete. Please fix and retry.")
         sys.exit(1)
 
 

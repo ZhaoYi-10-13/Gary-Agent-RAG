@@ -2,105 +2,75 @@
 # Directory: yt-rag/app/services/chat.py
 
 """
-Chat completion service for generating RAG responses.
-Supports both OpenAI and Anthropic with configurable models.
+Chat service using Alibaba Qwen (DashScope OpenAI-compatible endpoint).
+Generates concise answers with citations when context blocks are provided.
 """
 
 import logging
-from typing import List, Dict, Any
-import openai
-import anthropic
+from typing import List, Dict
+from openai import OpenAI
 from ..core.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
+# 固定使用 DashScope 的 OpenAI 兼容地址
+_DASHSCOPE_BASE = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+SYSTEM_PROMPT = (
+    "You are a helpful customer support assistant. "
+    "Answer user questions based strictly on the provided context. "
+    "If the answer is in the context, give a short and clear reply, and cite with [chunk_id]. "
+    "If the context does not contain the answer, say politely 'I don’t know'. "
+    "Do not use markdown, section headers, or special symbols. "
+    "Keep the answer concise and professional."
+)
+
+def _format_context(context_blocks: List[Dict]) -> str:
+    """格式化检索到的上下文块（便于模型引用并输出 [chunk_id]）"""
+    parts = []
+    for b in context_blocks:
+        cid = b.get("chunk_id", "UNKNOWN_ID")
+        txt = (b.get("text") or "").strip()
+        parts.append(f"[{cid}] {txt}")
+    return "\n\n".join(parts) if parts else "N/A"
 
 class ChatService:
-    """Service for chat completions supporting multiple AI providers."""
-    
+    """Qwen chat completion via DashScope"""
+
     def __init__(self):
-        """Initialize chat clients based on configuration."""
-        self.provider = settings.ai_provider
-        
-        if self.provider == "openai":
-            self.client = openai.OpenAI(api_key=settings.openai_api_key)
-            self.model = settings.openai_chat_model
-        elif self.provider == "anthropic":
-            self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-            self.model = settings.anthropic_chat_model
-        else:
-            raise ValueError(f"Unsupported AI provider: {self.provider}")
-        
-        logger.info(f"Initialized chat service with {self.provider} ({self.model})")
-    
-    async def generate_answer(self, query: str, context_blocks: List[Dict[str, Any]]) -> str:
-        """
-        Generate RAG answer using context blocks.
-        
-        Args:
-            query: User's question
-            context_blocks: Retrieved chunks with metadata
-            
-        Returns:
-            Generated answer with citations
-        """
-        # Build context string with citations
-        context_parts = []
-        for block in context_blocks:
-            chunk_id = block.get('chunk_id', 'unknown')
-            text = block.get('text', '')
-            context_parts.append(f"[{chunk_id}] {text}")
-        
-        context = "\n\n".join(context_parts)
-        
-        system_prompt = """You are a helpful AI assistant for customer support that answers questions based on provided context.
+        self.client = OpenAI(
+            api_key=settings.aliyun_api_key,
+            base_url=_DASHSCOPE_BASE,
+        )
+        self.model = settings.aliyun_chat_model
+        self.temperature = settings.temperature
 
-                            IMPORTANT RULES:
-                            1. For questions about policies, returns, shipping, sizing, or support: Answer ONLY using the provided context and include citations
-                            2. For general greetings or casual conversation: You can respond naturally and friendly
-                            3. For questions outside your knowledge base: Politely redirect to relevant policies or suggest contacting support
-                            4. Always include citations [chunk_id] when using context information
-                            5. Be concise but comprehensive
-                            6. Maintain a helpful, professional tone"""
-
-        user_prompt = f"""Context:
-                        {context}
-
-                        Question: {query}
-
-                        Please provide an answer based on the context above, including appropriate citations."""
-
+    async def generate_answer(self, query: str, context_blocks: List[Dict]) -> str:
+        """生成简洁的客服答案"""
         try:
-            if self.provider == "openai":
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    temperature=settings.temperature,
-                    max_tokens=1000
-                )
-                answer = response.choices[0].message.content
-                
-            elif self.provider == "anthropic":
-                response = self.client.messages.create(
-                    model=self.model,
-                    max_tokens=1000,
-                    temperature=settings.temperature,
-                    system=system_prompt,
-                    messages=[{"role": "user", "content": user_prompt}]
-                )
-                answer = response.content[0].text
-            
-            logger.info(f"Generated answer using {self.provider}")
-            return answer or "I couldn't generate an answer."
-            
+            context_text = _format_context(context_blocks)
+
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": f"Context:\n{context_text}\n\nQuestion:\n{query}"
+                },
+            ]
+
+            resp = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=self.temperature,
+                max_tokens=512,
+            )
+            return resp.choices[0].message.content.strip()
+
         except Exception as e:
-            logger.error(f"Failed to generate answer: {e}")
-            return f"I encountered an error while processing your question: {str(e)}"
+            logger.error(f"Failed to generate answer via Qwen: {e}")
+            raise
 
 
-# Global service instance
+# Global instance
 chat_service = ChatService()
