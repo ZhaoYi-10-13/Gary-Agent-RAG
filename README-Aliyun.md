@@ -36,7 +36,8 @@ source venv_yt_rag/bin/activate
 pip install -r requirements.txt
 ```
 剩下的步骤和文档里的一样，确保测试通过即可
-⸻
+
+---
 
 ## 3. 启动服务
 
@@ -50,7 +51,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 	•	8000 端口：开发与调试推荐
 	•	80 端口：生产环境推荐（无需加端口号）
 
-⸻
+---
 
 ## 4. 配置防火墙 (UFW)
 
@@ -71,7 +72,7 @@ sudo ufw allow 8000/tcp
 sudo ufw reload
 ```
 
-⸻
+---
 
 ## 5. 配置安全组
 
@@ -84,7 +85,7 @@ sudo ufw reload
 	4.	优先级和授权策略保持默认
 	5.	点击 确定 保存
 
-⸻
+---
 
 ## 6. 检查服务运行状态
 
@@ -102,7 +103,7 @@ curl http://127.0.0.1/healthz
 ```
 说明服务已启动成功（提示 degraded 是正常的，因为数据库服务器在国外）。
 
-⸻
+---
 
 ## 7. 浏览器访问
 	1.	回到阿里云 控制台 → 网络与安全组
