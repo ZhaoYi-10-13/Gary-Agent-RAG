@@ -11,12 +11,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, JSONResponse
 
 from .core.config import get_settings
 from .core.database import db
 from .models.requests import SeedRequest, AnswerRequest
-from .models.responses import SeedResponse, AnswerResponse, HealthResponse, ErrorResponse
+from .models.responses import SeedResponse, AnswerResponse, HealthResponse
 from .services.rag import rag_service
 from .data.default_documents import DEFAULT_DOCUMENTS
 
@@ -113,15 +113,7 @@ async def root():
 
 @app.get("/greet/{name}", tags=["General"])
 async def greet(name: str):
-    """
-    Greet endpoint that returns a personalized greeting.
-    
-    Args:
-        name (str): Name of the person to greet
-        
-    Returns:
-        Personalized greeting message
-    """
+    """Greet endpoint that returns a personalized greeting."""
     return {"message": f"Hello, {name}! I think you are great!"}
 
 
@@ -129,14 +121,11 @@ async def greet(name: str):
 async def health_check():
     """Health check endpoint with database connectivity test."""
     try:
-        # Test database connection
         db_healthy = await db.health_check()
-        
         return HealthResponse(
             status="ok" if db_healthy else "degraded",
             database_connected=db_healthy
         )
-        
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(
@@ -147,27 +136,15 @@ async def health_check():
 
 @app.get("/documents", tags=["General"])
 async def get_documents():
-    """
-    Get the default documents used for seeding the knowledge base.
-    
-    Returns:
-        List of default documents with their chunk_id, source, and text
-    """
+    """Get the default documents used for seeding the knowledge base."""
     return {"documents": DEFAULT_DOCUMENTS}
 
 
 @app.post("/seed", response_model=SeedResponse, tags=["RAG"])
 async def seed_documents(request: SeedRequest = SeedRequest()):
-    """
-    Seed the knowledge base with documents.
-    
-    If no documents are provided, seeds with default policy/FAQ documents.
-    Documents are chunked, embedded, and stored in the vector database.
-    """
+    """Seed the knowledge base with documents."""
     try:
         logger.info("Starting document seeding process")
-        
-        # Convert request documents to the format expected by RAG service
         documents = None
         if request.docs:
             documents = [
@@ -178,14 +155,9 @@ async def seed_documents(request: SeedRequest = SeedRequest()):
                 }
                 for doc in request.docs
             ]
-        
-        # Process documents through RAG pipeline
         inserted_count = await rag_service.seed_documents(documents)
-        
         logger.info(f"Seeding completed: {inserted_count} chunks inserted")
-        
         return SeedResponse(inserted=inserted_count)
-        
     except Exception as e:
         logger.error(f"Seeding failed: {e}")
         raise HTTPException(
@@ -196,25 +168,13 @@ async def seed_documents(request: SeedRequest = SeedRequest()):
 
 @app.post("/answer", response_model=AnswerResponse, tags=["RAG"])
 async def answer_question(request: AnswerRequest):
-    """
-    Answer a question using RAG (Retrieval-Augmented Generation).
-    
-    Pipeline:
-    1. Embed the query
-    2. Vector similarity search to find relevant chunks
-    3. Generate answer using LLM with context
-    4. Return answer with citations and debug info
-    """
+    """Answer a question using RAG pipeline."""
     try:
         logger.info(f"Processing query: '{request.query[:100]}...'")
-        
-        # Process query through RAG pipeline
         result = await rag_service.answer_query(
             query=request.query,
             top_k=request.top_k
         )
-        
-        # Convert to response model
         response = AnswerResponse(
             text=result['text'],
             citations=result['citations'],
@@ -223,11 +183,8 @@ async def answer_question(request: AnswerRequest):
                 'latency_ms': result['debug']['latency_ms']
             }
         )
-        
         logger.info(f"Query processed successfully in {result['debug']['latency_ms']}ms")
-        
         return response
-        
     except Exception as e:
         logger.error(f"Query processing failed: {e}")
         raise HTTPException(
@@ -240,20 +197,26 @@ async def answer_question(request: AnswerRequest):
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
     """Handle 404 errors."""
-    return {
-        "error": "Not Found",
-        "detail": "The requested endpoint does not exist",
-        "available_endpoints": ["/", "/healthz", "/seed", "/answer", "/docs"]
-    }
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Not Found",
+            "detail": "The requested endpoint does not exist",
+            "available_endpoints": ["/", "/healthz", "/seed", "/answer", "/docs"]
+        }
+    )
 
 
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
     """Handle 500 errors."""
     logger.error(f"Internal server error: {exc}")
-    return ErrorResponse(
-        error="Internal Server Error",
-        detail="An unexpected error occurred. Please check the logs."
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "detail": "An unexpected error occurred. Please check the logs."
+        }
     )
 
 
