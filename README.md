@@ -286,6 +286,7 @@ source venv_gary_rag/bin/activate
 # 安装依赖
 pip install -r requirements.txt
 ```
+之后的步骤和前面是一样的，确保测试通过即可
 ⸻
 
 ## 3. 启动服务
