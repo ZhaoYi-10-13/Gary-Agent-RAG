@@ -129,7 +129,7 @@ This verifies:
 
 ```bash
 uvicorn main:app --reload --port 8000
-# uvicorn main:app --host 0.0.0.0 --port 80 for Aliyun service
+uvicorn main:app --host 0.0.0.0 --port 80 # For Aliyun service
 ```
 
 The API will be available at:
