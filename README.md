@@ -1,7 +1,6 @@
 # RAG AI Agent Backend
 
 Welcome to the China-adapted version of the [yt-rag project](https://github.com/ShenSeanChen/yt-rag/tree/main)!. This edition uses Chinese service providers for the chat model, embedding model, and server deployment, making it accessible to users in China who cannot open overseas services due to the lack of a Visa and Mastercard.
-A minimal, production-ready FastAPI backend demonstrating Retrieval-Augmented Generation (RAG) with vector similarity search. Built for educational purposes and easy frontend integration.
 
 ## 🎯 Features
 	•	FastAPI backend with automatic API documentation
