@@ -1,5 +1,7 @@
 # RAG AI Agent Backend
 
+The original author is [ShenSeanChen](https://github.com/ShenSeanChen). My contribution ensures that users without access to the OpenAI API or Google Cloud can still run the project successfully.
+
 A minimal, production-ready FastAPI backend demonstrating Retrieval-Augmented Generation (RAG) with vector similarity search. Built for educational purposes and easy frontend integration.
 
 ## 🎯 Features
