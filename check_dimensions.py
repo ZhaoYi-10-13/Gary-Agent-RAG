@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2024
-# Directory: yt-rag/check_dimensions.py
+# Directory: Gary-Agent-RAG/check_dimensions.py
 
 """
 Quick script to check embedding dimensions in the database.
