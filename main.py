@@ -1,5 +1,5 @@
 # Copyright 2024
-# Directory: yt-rag/main.py
+# Directory: Gary-Agent-RAG/main.py
 
 """
 Legacy entry point for backward compatibility.
