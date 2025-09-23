@@ -1,8 +1,8 @@
-RAG AI Agent Backend
+# RAG AI Agent Backend
 
 A minimal, production-ready FastAPI backend demonstrating Retrieval-Augmented Generation (RAG) with vector similarity search. Built for educational purposes and easy frontend integration.
 
-🎯 Features
+## 🎯 Features
 	•	FastAPI backend with automatic API documentation
 	•	Supabase integration with pgvector for vector similarity search
 	•	Multi-AI Provider support (Aliyun, OpenAI & Anthropic)
@@ -11,7 +11,7 @@ A minimal, production-ready FastAPI backend demonstrating Retrieval-Augmented Ge
 	•	Citation-based answers with source tracking
 	•	Docker containerization for easy deployment
 
-🏗️ Architecture
+## 🏗️ Architecture
 
 Gary-Agent-RAG/
 ├── app/
