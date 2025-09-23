@@ -1,5 +1,5 @@
 # Copyright 2024
-# Directory: yt-rag/app/models/entities.py
+# Directory: Gary-Agent-RAG/app/models/entities.py
 
 """
 Database entity models for the RAG application.
