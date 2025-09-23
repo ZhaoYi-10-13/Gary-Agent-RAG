@@ -1,5 +1,5 @@
 # Copyright 2024
-# Directory: yt-rag/app/main.py
+# Directory: Gary-Agent-RAG/app/main.py
 
 """
 FastAPI application for RAG (Retrieval-Augmented Generation) backend.
