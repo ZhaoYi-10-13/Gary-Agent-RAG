@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2024
-# Directory: yt-rag/verify_rag.py
+# Directory: Gary-Agent-RAG/verify_rag.py
 
 """
 Script to prove we're doing real RAG with vector similarity search.
