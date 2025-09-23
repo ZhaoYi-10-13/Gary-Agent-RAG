@@ -67,7 +67,7 @@ pip install -r requirements.txt
    - **Service role secret key** (starts with `eyJ...`)
 
 **Aliyun Setup (recommended):**
-1.	Go to Aliyun Bailian Console
+1.	Go to [Aliyun Bailian Console](https://bailian.console.aliyun.com)
 2.	Login and get the API for large models (LLM API Key)
 3.	Copy your ALIYUN_API_KEY
 
