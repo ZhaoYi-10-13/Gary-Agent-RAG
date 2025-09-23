@@ -1,5 +1,5 @@
 # Copyright 2024
-# Directory: yt-rag/app/data/default_documents.py
+# Directory: Gary-Agent-RAG/app/data/default_documents.py
 
 """
 Default documents for seeding the RAG knowledge base.
