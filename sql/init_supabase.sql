@@ -2,7 +2,7 @@
 -- 0) Extension
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- 1) Drop dependent objects (幂等安全删除)
+-- 1) Drop dependent objects
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
@@ -31,7 +31,7 @@ BEGIN
   END IF;
 END$$;
 
--- 2) Drop policies & indexes & table（若存在）
+-- 2) Drop policies & indexes & table
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='rag_chunks') THEN
@@ -53,7 +53,7 @@ CREATE TABLE public.rag_chunks (
   chunk_id   TEXT NOT NULL UNIQUE,
   source     TEXT NOT NULL,
   text       TEXT NOT NULL,
-  embedding  VECTOR(1024),               -- 1024 维
+  embedding  VECTOR(1024),              
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -66,8 +66,8 @@ CREATE INDEX rag_chunks_src_idx        ON public.rag_chunks (source);
 CREATE INDEX rag_chunks_chunk_id_idx   ON public.rag_chunks (chunk_id);
 CREATE INDEX rag_chunks_created_at_idx ON public.rag_chunks (created_at DESC);
 
--- 5) RPC：两种签名，兼容后端
--- 5.1 三参版：match_count + min_similarity
+-- 5) RPC
+-- 5.1 match_count + min_similarity
 CREATE OR REPLACE FUNCTION public.match_chunks (
   query_embedding vector(1024),
   match_count     int   DEFAULT 6,
@@ -98,7 +98,7 @@ BEGIN
 END;
 $$;
 
--- 5.2 四参版：threshold + count + min_content_length
+-- 5.2 threshold + count + min_content_length
 CREATE OR REPLACE FUNCTION public.match_chunks (
   query_embedding    vector(1024),
   match_threshold    float,
@@ -154,11 +154,9 @@ CREATE POLICY "Allow service role full access" ON public.rag_chunks
 CREATE POLICY "Allow authenticated read access" ON public.rag_chunks
   FOR SELECT USING (auth.role() = 'authenticated');
 
--- 开发期可保留匿名读；生产务必删除
 CREATE POLICY "Allow anonymous read access" ON public.rag_chunks
   FOR SELECT USING (true);
 
--- （可选）授权 RPC
 GRANT EXECUTE ON FUNCTION public.match_chunks(vector(1024), int, float)   TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.match_chunks(vector(1024), float, int, int) TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.get_chunk_stats()                         TO anon, authenticated, service_role;
