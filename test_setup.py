@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 # Copyright 2024
-# Directory: yt-rag/test_setup.py
+# Directory: Gary-Agent-RAG/test_setup.py
 
 """
 Test script to verify RAG backend setup is working correctly.
 Run this after completing the setup steps.
-
-改动要点：
-1) 在导入项目模块前，清理掉 OPENAI_API_BASE 等非法 key（避免 Pydantic extra=forbid）
-2) 按 AI_PROVIDER 动态校验所需的环境变量（aliyun / openai）
-3) 按 provider 打印 Chat / Embedding 实际配置与 Base URL
 """
 
 import asyncio
@@ -52,13 +47,11 @@ async def test_setup():
         settings = get_settings()
         provider = (getattr(settings, "ai_provider", "aliyun") or "aliyun").lower()
 
-        # 基础必需项（与 provider 无关）
         required_vars = [
             "SUPABASE_URL",
             "SUPABASE_ANON_KEY",
             "SUPABASE_SERVICE_ROLE_KEY",
         ]
-        # 根据 provider 追加必需项
         if provider == "aliyun":
             required_vars += ["ALIYUN_API_KEY"]
         else:
@@ -69,7 +62,6 @@ async def test_setup():
             print(f"   ❌ Missing environment variables: {', '.join(missing)}")
             return False
 
-        # 打印关键配置（随 provider 变化）
         print("   ✅ Environment variables configured")
         if provider == "aliyun":
             print(f"   📊 Embedding model: {getattr(settings, 'aliyun_embed_model', 'N/A')}")
@@ -80,7 +72,6 @@ async def test_setup():
             print(f"   📊 Embedding model: {getattr(settings, 'openai_embed_model', 'N/A')}")
             print(f"   🤖 Chat model: {getattr(settings, 'openai_chat_model', 'N/A')}")
             print(f"   🔗 AI provider: {provider}")
-            # OpenAI 情况不强制打印 base_url，避免误导
 
         # Test 3: Database connection
         print("\n3️⃣  Testing database connection...")
