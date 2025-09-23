@@ -209,36 +209,6 @@ curl -X POST http://localhost:8000/answer \
 }
 ```
 
-## 🔧 Configuration Options
-
-### AI Providers
-
-**OpenAI (Recommended)**
-```env
-AI_PROVIDER=openai
-OPENAI_API_KEY=your_key
-OPENAI_EMBED_MODEL=text-embedding-3-small  # 1536 dimensions
-OPENAI_CHAT_MODEL=gpt-4o-mini
-```
-
-**Anthropic Claude**
-```env
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=your_key
-ANTHROPIC_CHAT_MODEL=claude-3-haiku-20240307
-
-# Note: Still need OpenAI key for embeddings
-OPENAI_API_KEY=your_openai_key
-```
-
-### RAG Parameters
-
-Adjust in `app/core/config.py`:
-- `chunk_size`: Token limit per chunk (default: 400)
-- `chunk_overlap`: Overlap between chunks (default: 60 tokens)
-- `default_top_k`: Number of chunks to retrieve (default: 6)
-- `temperature`: LLM creativity (default: 0.1)
-
 ## 🐳 Docker Deployment
 
 ```bash
