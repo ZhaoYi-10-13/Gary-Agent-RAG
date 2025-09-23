@@ -264,19 +264,28 @@ docker run -p 8080:8080 --env-file .env yt-rag
 ---
 
 ## 2. 克隆项目与环境配置
-### 1. 在 ECS 终端中执行 **GitHub 克隆**：  
+在基础的ECS服务器中下载可能需要一段时间
 ```bash  
-git clone <your-repo-url>
-cd <your-repo>
-```
-### 2.	激活 Python 虚拟环境并安装依赖（低配 ECS 可能会稍慢）：
+# 更新系统包
+sudo apt update && sudo apt upgrade -y
 
-```bash
-python3.11 -m venv venv
-source venv/bin/activate
+# 安装 Python 3.11 及其工具
+sudo apt install -y python3.11 python3.11-venv python3.11-dev python3.11-distutils
+
+# 安装常用工具
+sudo apt install -y git curl build-essential
+
+# 克隆项目
+git clone https://github.com/ZhaoYi-10-13/Gary-Agent-RAG.git
+cd Gary-Agent-RAG
+
+# 创建虚拟环境
+python3.11 -m venv venv_gary_rag
+source venv_gary_rag/bin/activate
+
+# 安装依赖
 pip install -r requirements.txt
 ```
-
 ⸻
 
 ## 3. 启动服务
@@ -361,5 +370,3 @@ http://<公网IP>/chat
 
 
 即可进入聊天页面 🎉
-
-⸻
