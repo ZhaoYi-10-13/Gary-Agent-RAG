@@ -27,7 +27,7 @@ Gary-Agent-RAG/
 
 ## 🚀 Quick Start Guide
 
-** Complete setup from clone to asking questions in ~10 minutes
+**Complete setup from clone to asking questions in ~10 minutes**
 
 ⸻
 
