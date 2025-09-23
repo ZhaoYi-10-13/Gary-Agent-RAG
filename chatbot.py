@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2024
-# Directory: yt-rag/chatbot.py
+# Directory: Gary-Agent-RAG/chatbot.py
 
 """
 Beautiful terminal-based chatbot to interact with the RAG backend API.
