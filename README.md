@@ -29,7 +29,7 @@ Gary-Agent-RAG/
 
 **Complete setup from clone to asking questions in ~10 minutes**
 
-⸻
+---
 
 ### Prerequisites
 - Python 3.11+
@@ -37,7 +37,7 @@ Gary-Agent-RAG/
 - Aliyun API key 
 - Anthropic API key (optional, for Claude)
 
-⸻
+---
 
 ### Step 1: Clone and Install Dependencies
 
@@ -54,7 +54,7 @@ source venv_gary_rag/bin/activate  # On Windows: venv_gary_rag\Scripts\activate
 pip install -r requirements.txt
 ```
 
-⸻
+---
 
 ### Step 2: Get API Keys (5 minutes)
 
@@ -74,7 +74,7 @@ pip install -r requirements.txt
 **(Optional) OpenAI / Anthropic Setup:**
 You can also configure OPENAI_API_KEY or ANTHROPIC_API_KEY as backup providers.
 
-⸻
+---
 
 ### Step 3: Configure Environment
 
@@ -115,7 +115,7 @@ ENVIRONMENT=development
 LOG_LEVEL=INFO
 ```
 
-⸻
+---
 
 ### Step 4: Initialize Database (2 minutes)
 
@@ -131,7 +131,7 @@ LOG_LEVEL=INFO
 - Vector search functions
 - RLS policies for future auth
 
-⸻
+---
 
 ### Step 5: Test Setup (Optional)
 
@@ -147,7 +147,7 @@ This verifies:
 - ✅ Schema initialized
 - ✅ RAG pipeline working
 - 
-⸻
+---
 
 ### Step 6: Start the Server
 
@@ -287,7 +287,7 @@ source venv_gary_rag/bin/activate
 pip install -r requirements.txt
 ```
 之后的步骤和前面是一样的，确保测试通过即可
-⸻
+---
 
 ## 3. 启动服务
 
@@ -301,7 +301,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 	•	8000 端口：开发与调试推荐
 	•	80 端口：生产环境推荐（无需加端口号）
 
-⸻
+---
 
 ## 4. 配置防火墙 (UFW)
 
@@ -322,7 +322,7 @@ sudo ufw allow 8000/tcp
 sudo ufw reload
 ```
 
-⸻
+---
 
 ## 5. 配置安全组
 
@@ -335,7 +335,7 @@ sudo ufw reload
 	4.	优先级和授权策略保持默认
 	5.	点击 确定 保存
 
-⸻
+---
 
 ## 6. 检查服务运行状态
 
@@ -353,7 +353,7 @@ curl http://127.0.0.1/healthz
 ```
 说明服务已启动成功（提示 degraded 是正常的，因为数据库服务器在国外）。
 
-⸻
+---
 
 ## 7. 浏览器访问
 	1.	回到阿里云 控制台 → 网络与安全组
