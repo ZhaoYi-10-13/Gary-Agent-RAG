@@ -94,10 +94,9 @@ SUPABASE_ANON_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 
 # -------- AI Provider --------
-# 默认走阿里云通义千问
 AI_PROVIDER=aliyun
 
-# 阿里云通义千问配置
+# Aliyun Qwen (default)
 ALIYUN_API_KEY=sk-your_aliyun_key_here
 ALIYUN_CHAT_MODEL=qwen-plus
 ALIYUN_EMBED_MODEL=text-embedding-v4
