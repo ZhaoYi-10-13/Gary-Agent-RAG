@@ -340,5 +340,6 @@ http://<公网IP>:8000/chat
 
 http://<公网IP>/chat
 
-
 即可进入聊天页面 🎉
+
+如果你觉得页面太单一，可以查看[这个项目](https://github.com/ZhaoYi-10-13/Agent-ui.git)去了解如何基于 React + Vite 构建一个首页从而做到更精美！
