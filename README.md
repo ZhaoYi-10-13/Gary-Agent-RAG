@@ -1,6 +1,6 @@
 # RAG AI Agent Backend
 
-Welcome to the China-adapted version of the [yt-rag project](https://github.com/ShenSeanChen/yt-rag/tree/main)!. This edition uses Chinese service providers for the chat model, embedding model, and server deployment, making it accessible to users in China who cannot open overseas services due to the lack of a Visa and Mastercard.
+This repository presents a Agent system, designed for users in China who cannot open overseas services due to the lack of a Visa and Mastercard by integrating Chinese service providers for chat models, embedding models, and server deployment. Thanks to my partner [ShenSeanChen](https://github.com/ShenSeanChen), feel free to check out and star [his repo](https://github.com/ShenSeanChen/yt-rag.git)!
 
 ## 🎯 Features
 	•	FastAPI backend with automatic API documentation
